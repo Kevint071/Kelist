@@ -102,11 +102,11 @@ const EnhancedBackgroundAnimation = () => {
 
   return (
     <>
-      {/* Fondo de base para prevenir el flash de fondo blanco */}
-      <div className="animate-fadeIn absolute inset-0 z-0 bg-gradient-to-br from-black via-slate-900 to-black" />
+      {/* Fondo de base con position: fixed */}
+      <div className="animate-fadeIn fixed inset-0 z-0 bg-gradient-to-br from-black via-slate-900 to-black" />
 
-      {/* Efecto de partículas flotantes mejorado con aparición INMEDIATA */}
-      <div className="absolute inset-0 z-0">
+      {/* Partículas flotantes con position: fixed */}
+      <div className="fixed inset-0 z-0">
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
@@ -116,10 +116,8 @@ const EnhancedBackgroundAnimation = () => {
               height: particle.size,
               left: `${particle.left}%`,
               top: `${particle.top}%`,
-              // Hacemos que las primeras partículas tengan una opacidad inicial para evitar el flash
               opacity: particle.id < 15 ? particle.opacityMax * 0.8 : 0,
             }}
-            // Las primeras partículas comienzan ya visibles para efecto inmediato
             initial={
               particle.id < 15
                 ? {
@@ -127,42 +125,32 @@ const EnhancedBackgroundAnimation = () => {
                     y: -particle.yMovementRange * 0.5,
                     scale: 1,
                   }
-                : {
-                    opacity: 0,
-                    y: -10,
-                    scale: 0.6,
-                  }
+                : { opacity: 0, y: -10, scale: 0.6 }
             }
             animate={{
               y: [-10, -particle.yMovementRange, -10],
               opacity: [
-                // Valores personalizados según el índice de la partícula
                 particle.id < 15 ? particle.opacityMax * 0.9 : 0.3,
                 particle.opacityMax,
                 0.3,
               ],
-              scale: [
-                // Las primeras partículas comienzan más grandes
-                particle.id < 15 ? 0.9 : 0.6,
-                1,
-                0.6,
-              ],
+              scale: [particle.id < 15 ? 0.9 : 0.6, 1, 0.6],
             }}
             transition={{
               repeat: Infinity,
               repeatType: "loop",
               duration: particle.duration * 0.8,
               delay: particle.delay * 0.5,
-              times: [0, 0.5, 1], // Controla los puntos de transición
+              times: [0, 0.5, 1],
               ease: "easeInOut",
             }}
           />
         ))}
       </div>
 
-      {/* Efecto de vignette */}
+      {/* Efecto de vignette con position: fixed */}
       <div
-        className="pointer-events-none absolute inset-0 z-10 bg-black/50"
+        className="pointer-events-none fixed inset-0 z-10 bg-black/50"
         style={{
           maskImage:
             "radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%)",
