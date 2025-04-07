@@ -3,12 +3,14 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import MobileMenu from "@/components/NavBar/MobileMenu";
 import { useAuthStore } from "@/lib/authStore";
+import { useRouter } from "next/navigation";
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { isAuthenticated, isLoading, logout } = useAuthStore();
+  const { isAuthenticated, isLoading, userId, logout } = useAuthStore();
+  const router = useRouter();
 
   // Marcar como montado solo en el cliente
   useEffect(() => {
@@ -18,6 +20,12 @@ export default function NavBar() {
   // Función para cerrar el menú cuando se hace clic en un enlace
   const handleLinkClick = () => {
     setIsOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push("/auth/acceder");
+    handleLinkClick();
   };
 
   // Función para manejar clics fuera del menú
@@ -41,7 +49,7 @@ export default function NavBar() {
   // Si no está montado o está cargando, renderiza un estado intermedio
   if (!isMounted || isLoading) {
     return (
-      <nav className="sticky top-0 z-50 shadow-md bg-gray-900 text-white">
+      <nav className="sticky top-0 z-50 bg-gray-900 text-white shadow-md">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="container mx-auto flex h-16 items-center justify-between">
             <Link href="/" className="group flex-shrink-0 font-bold">
@@ -88,14 +96,14 @@ export default function NavBar() {
               {isAuthenticated ? (
                 <>
                   <Link
-                    href="/dashboard"
                     className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    href={`/dashboard/${userId}`}
                   >
                     Dashboard
                   </Link>
                   <button
                     className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    onClick={logout}
+                    onClick={handleLogout}
                   >
                     Cerrar sesión
                   </button>
@@ -130,8 +138,8 @@ export default function NavBar() {
           id="mobile-menu"
         >
           <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
-          <Link
-              href="/dashboard"
+            <Link
+              href={`/dashboard/${userId}`}
               className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
               onClick={handleLinkClick}
             >
@@ -149,7 +157,7 @@ export default function NavBar() {
                 className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                 onClick={() => {
                   handleLinkClick();
-                  logout();
+                  handleLogout();
                 }}
               >
                 Cerrar sesión

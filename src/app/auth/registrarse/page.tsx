@@ -4,9 +4,10 @@ import { useState } from "react";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import TitleForm from "@/components/Auth/TitleForm";
+import { TitleForm, TermsAndPrivacyNotice } from "@/components/Auth";
 import { useRouter } from "next/navigation";
 import BackGroundAnimation from "@/components/BackGroundAnimation";
+import ButtonHighLight from "@/components/ui/ButtonHighLight";
 
 export default function Registrarse() {
   const {
@@ -51,7 +52,10 @@ export default function Registrarse() {
       <BackGroundAnimation />
       {/* Contenedor principal */}
       <div className="relative z-10 mt-5 mb-20 w-full max-w-md">
-      <TitleForm title="Crea tu cuenta" description="Únete a Kelist y organiza tu día con facilidad"/>
+        <TitleForm
+          title="Crea tu cuenta"
+          description="Únete a Kelist y organiza tu día con facilidad"
+        />
         <form onSubmit={onSubmit} className="space-y-7">
           {/* Campos de nombres y apellidos */}
           <div className="flex space-x-4">
@@ -224,13 +228,7 @@ export default function Registrarse() {
             )}
           </div>
 
-          {/* Botón de registro */}
-          <button
-            type="submit"
-            className="mt-10 w-full rounded-lg bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 px-4 py-3 font-medium text-white transition-all duration-300 hover:shadow-lg"
-          >
-            Registrarse
-          </button>
+          <ButtonHighLight type="submit" children="Registrarse" />
 
           {/* Separador */}
           {/*
@@ -244,28 +242,15 @@ export default function Registrarse() {
           <div className="mt-4 text-center">
             <p className="text-sm font-semibold text-gray-400">
               ¿Ya tienes una cuenta?{" "}
-              <Link href="/login" className="text-cyan-400 hover:text-cyan-300">
+              <Link
+                href="/auth/acceder"
+                className="text-cyan-400 hover:text-cyan-300"
+              >
                 Inicia sesión
               </Link>
             </p>
           </div>
-
-          {/* Terminos y Política de Privacidad*/}
-          <div className="mt-4 text-center font-semibold">
-            <p className="text-xs text-gray-400">
-              Al registrarte, aceptas nuestros{" "}
-              <Link href="/terms" className="text-cyan-400 hover:text-cyan-400">
-                Términos
-              </Link>{" "}
-              y{" "}
-              <Link
-                href="/privacy"
-                className="text-cyan-400 hover:text-cyan-400"
-              >
-                Política de Privacidad
-              </Link>
-            </p>
-          </div>
+          <TermsAndPrivacyNotice message="Al registrarte, aceptas nuestros" />
         </form>
       </div>
     </div>

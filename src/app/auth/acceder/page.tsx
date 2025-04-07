@@ -7,7 +7,9 @@ import { useForm } from "react-hook-form";
 import BackGroundAnimation from "@/components/BackGroundAnimation";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/authStore";
-import TitleForm from '@/components/Auth/TitleForm'
+import { TitleForm, TermsAndPrivacyNotice } from "@/components/Auth";
+import Checkbox from "@/components/ui/Checkbox";
+import ButtonHighLight from "@/components/ui/ButtonHighLight";
 
 export default function Acceder() {
   const {
@@ -15,33 +17,20 @@ export default function Acceder() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const { login } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const setTokens = useAuthStore((state) => state.setTokens);
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      const res = await fetch("http://localhost:5206/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const resJSON = await res.json();
-      console.log(resJSON);
-
-      if (res.ok) {
-        setTokens(resJSON.accessToken, resJSON.refreshToken);
-        router.push("/dashboard");
-        router.refresh();
-      } else {
-        alert(resJSON.title || "Error al iniciar sesión");
-      }
-    } catch (error) {
-      console.error("Error en el inicio de sesión:", error);
-      alert("Ocurrió un error al intentar iniciar sesión");
+    const result = await login(data.email, data.password);
+    if (result.success && result.userId) {
+      router.push(`/dashboard/${result.userId}`);
+    } else {
+      setError(
+        "Error al iniciar sesión o no se encontró el correo del usuario",
+      );
     }
   });
 
@@ -50,7 +39,11 @@ export default function Acceder() {
       <BackGroundAnimation />
       {/* Contenedor principal */}
       <div className="relative z-10 mt-5 mb-20 w-full max-w-md">
-        <TitleForm title="¡Accede a tu cuenta!" description="Conéctate a Kelist y toma el control de tu día."/>
+        <TitleForm
+          title="¡Accede a tu cuenta!"
+          description="Conéctate a Kelist y toma el control de tu día."
+        />
+        {error && <p className="mb-4 text-center text-red-500">{error}</p>}
         <form onSubmit={onSubmit} className="space-y-7">
           {/* Correo electrónico */}
           <div>
@@ -122,23 +115,13 @@ export default function Acceder() {
 
           {/* Checkbox para recordar sesión */}
           <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="recordar"
-              className="h-4 w-4 rounded border-gray-700 text-cyan-500 focus:ring-cyan-500"
-            />
+            <Checkbox />
             <label htmlFor="recordar" className="ml-2 text-sm text-gray-300">
               Recordar mi sesión
             </label>
           </div>
 
-          {/* Botón de registro */}
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 px-4 py-3 font-medium text-white transition-all duration-300 hover:shadow-lg"
-          >
-            Iniciar Sesión
-          </button>
+          <ButtonHighLight type="submit" children="Iniciar Sesión" />
 
           {/* Separador */}
           {/*
@@ -152,28 +135,15 @@ export default function Acceder() {
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-400">
               ¿No tienes una cuenta?{" "}
-              <Link href="/login" className="text-cyan-400 hover:text-cyan-300">
+              <Link
+                href="/auth/registrarse"
+                className="text-cyan-400 hover:text-cyan-300"
+              >
                 Regístrate
               </Link>
             </p>
           </div>
-
-          {/* Terminos y Política de Privacidad*/}
-          <div className="mt-4 text-center font-semibold">
-            <p className="text-xs text-gray-400">
-              Al registrarte, aceptas nuestros{" "}
-              <Link href="/terms" className="text-cyan-400 hover:text-cyan-400">
-                Términos
-              </Link>{" "}
-              y{" "}
-              <Link
-                href="/privacy"
-                className="text-cyan-400 hover:text-cyan-400"
-              >
-                Política de Privacidad
-              </Link>
-            </p>
-          </div>
+          <TermsAndPrivacyNotice message="Al iniciar sesión, aceptas nuestros" />
         </form>
       </div>
     </div>

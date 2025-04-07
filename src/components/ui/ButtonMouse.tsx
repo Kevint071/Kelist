@@ -1,18 +1,12 @@
-'use client'
-
-import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
 const ButtonMouse = () => {
-  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div className="flex items-center justify-center p-8">
       <a
         href="/auth/registrarse"
         className="relative group"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         {/* Borde sutil */}
         <div className="absolute inset-0 rounded-lg border border-indigo-500/30 transform transition-all duration-300 group-hover:border-indigo-400/50 group-hover:scale-105" />
