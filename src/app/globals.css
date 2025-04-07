@@ -20,6 +20,22 @@
       opacity: 1;
     }
   }
+
+  /* Variables para el checkbox */
+  --checkbox-diameter: 20px;
+  --checkbox-border-radius: 5px;
+  --checkbox-border-width: 1px;
+  --checkmark-size: 1.2;
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.12, 0.4, 0.29, 1.46);
+
+  /* Variables para el botón */
+  --btn-width: 140px;
+  --btn-height: 40px;
+  --btn-radius: 10px;
+  --btn-color-start: #2563eb; /* Similar a blue-600 */
+  --btn-color-middle: #9333ea; /* Similar a purple-600 */
+  --btn-color-end: #06b6d4; /* Similar a cyan-500 */
 }
 
 :root {
@@ -67,7 +83,118 @@
   --ring: oklch(0.87 0.01 286);
 }
 
-/* Animaciones personalizadas */
+@layer components {
+  .ui-checkbox {
+    appearance: none;
+    width: var(--checkbox-diameter);
+    height: var(--checkbox-diameter);
+    border-radius: var(--checkbox-border-radius);
+    background: var(--background);
+    border: var(--checkbox-border-width) solid var(--border);
+    transition: all 0.3s var(--ease-fluid);
+    cursor: pointer;
+    position: relative;
+    box-sizing: border-box;
+
+    /* Box-sizing para todos los elementos */
+    &,
+    & *,
+    & *::before,
+    & *::after {
+      box-sizing: border-box;
+    }
+
+    /* Checkmark */
+    &::before {
+      content: "";
+      position: absolute;
+      width: 4px;
+      height: 7px;
+      border-right: 2px solid var(--primary-foreground);
+      border-bottom: 2px solid var(--primary-foreground);
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg) scale(0);
+      opacity: 0;
+      transition:
+        all 0.1s cubic-bezier(0.71, -0.46, 0.88, 0.6),
+        opacity 0.1s;
+    }
+
+    /* Efecto ripple */
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      box-shadow: 0 0 0 calc(var(--checkbox-diameter) / 2.5) var(--primary);
+      border-radius: inherit;
+      opacity: 0;
+      transition: all 0.5s var(--ease-snappy);
+    }
+
+    &:hover {
+      border-color: var(--primary);
+    }
+
+    &:checked {
+      background: var(--primary);
+      border-color: transparent;
+
+      &::before {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(45deg)
+          scale(var(--checkmark-size));
+        transition: all 0.2s var(--ease-snappy) 0.1s;
+      }
+    }
+
+    &:active:not(:checked)::after {
+      transition: none;
+      box-shadow: none;
+      opacity: 1;
+    }
+  }
+
+  .button-highlight {
+    width: var(--btn-width);
+    height: var(--btn-height);
+    border: none;
+    border-radius: var(--btn-radius);
+    background: linear-gradient(
+      to right,
+      var(--btn-color-start),
+      var(--btn-color-middle),
+      var(--btn-color-end),
+      var(--btn-color-middle),
+      var(--btn-color-start)
+    );
+    background-size: 250%; /* Para la animación del gradiente */
+    background-position: left;
+    color: white;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      background-position 1s ease-in-out,
+      transform 0.3s ease-in-out;
+    overflow: hidden;
+
+    &:hover {
+      background-position: right;
+      box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+/* Animaciones personalizadas existentes */
 .fade-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
