@@ -10,6 +10,7 @@ import { useAuthStore } from "@/lib/authStore";
 import { TitleForm, TermsAndPrivacyNotice } from "@/components/Auth";
 import Checkbox from "@/components/ui/Checkbox";
 import ButtonHighLight from "@/components/ui/ButtonHighLight";
+import AccountExists from "@/components/Auth/AccountExists";
 
 export default function Acceder() {
   const {
@@ -122,27 +123,11 @@ export default function Acceder() {
           </div>
 
           <ButtonHighLight type="submit" children="Iniciar Sesión" />
-
-          {/* Separador */}
-          {/*
-          <div className="relative flex items-center py-3">
-            <div className="flex-grow border-t border-gray-500/50"></div>
-            <span className="mx-3 flex-shrink text-sm text-gray-400">o continúa con</span>
-            <div className="flex-grow border-t border-gray-500/50"></div>
-          </div> */}
-
-          {/* Enlace a login */}
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-400">
-              ¿No tienes una cuenta?{" "}
-              <Link
-                href="/auth/registrarse"
-                className="text-cyan-400 hover:text-cyan-300"
-              >
-                Regístrate
-              </Link>
-            </p>
-          </div>
+          <AccountExists
+            question="¿No tienes una cuenta?"
+            action="Regístrate"
+            href="/auth/registrarse"
+          />
           <TermsAndPrivacyNotice message="Al iniciar sesión, aceptas nuestros" />
         </form>
       </div>

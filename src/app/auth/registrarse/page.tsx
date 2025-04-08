@@ -8,6 +8,7 @@ import { TitleForm, TermsAndPrivacyNotice } from "@/components/Auth";
 import { useRouter } from "next/navigation";
 import BackGroundAnimation from "@/components/BackGroundAnimation";
 import ButtonHighLight from "@/components/ui/ButtonHighLight";
+import AccountExists from "@/components/Auth/AccountExists";
 
 export default function Registrarse() {
   const {
@@ -229,27 +230,11 @@ export default function Registrarse() {
           </div>
 
           <ButtonHighLight type="submit" children="Registrarse" />
-
-          {/* Separador */}
-          {/*
-          <div className="relative flex items-center py-3">
-            <div className="flex-grow border-t border-gray-500/50"></div>
-            <span className="mx-3 flex-shrink text-sm text-gray-400">o continúa con</span>
-            <div className="flex-grow border-t border-gray-500/50"></div>
-          </div> */}
-
-          {/* Enlace a login */}
-          <div className="mt-4 text-center">
-            <p className="text-sm font-semibold text-gray-400">
-              ¿Ya tienes una cuenta?{" "}
-              <Link
-                href="/auth/acceder"
-                className="text-cyan-400 hover:text-cyan-300"
-              >
-                Inicia sesión
-              </Link>
-            </p>
-          </div>
+          <AccountExists
+            question="¿Ya tienes una cuenta?"
+            action="Inicia sesión"
+            href="/auth/acceder"
+          />
           <TermsAndPrivacyNotice message="Al registrarte, aceptas nuestros" />
         </form>
       </div>
