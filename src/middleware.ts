@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import { useAuthStore } from "@/lib/authStore";
 
 // Cache para la clave de firma
-let cachedSigningKey: string | null;
+let cachedSigningKey: string | null = null;
 let lastFetched = 0;
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hora
 
-// Obtener la clave desde Vault
 async function fetchSigningKeyFromVault() {
   if (cachedSigningKey && Date.now() - lastFetched < CACHE_DURATION) {
     return cachedSigningKey;
@@ -28,72 +26,51 @@ async function fetchSigningKeyFromVault() {
   return cachedSigningKey;
 }
 
+async function verifyToken(token: string, secret: Uint8Array) {
+  try {
+    const { payload } = await jwtVerify(token, secret);
+    return payload[
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+    ] as string;
+  } catch (error) {
+    console.error("Error al verificar token:", error);
+    return null;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
   const pathname = request.nextUrl.pathname;
   const publicRoutes = ["/auth/acceder", "/auth/registrarse"];
 
   const signingKey = await fetchSigningKeyFromVault();
-  if (!signingKey) {
-    throw new Error("Signing key is null");
-  }
+  if (!signingKey) throw new Error("Signing key is null");
   const secret = new TextEncoder().encode(signingKey);
 
+  // Caso 1: Usuario autenticado intenta acceder a la página de login
   if (accessToken && pathname === "/auth/acceder") {
-    try {
-      const { payload } = await jwtVerify(accessToken, secret);
-      const userIdFromToken =
-        payload[
-          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-        ];
+    const userId = await verifyToken(accessToken, secret);
+    if (userId) {
       return NextResponse.redirect(
-        new URL(`/dashboard/${userIdFromToken}`, request.url),
+        new URL(`/dashboard/${userId}`, request.url),
       );
-    } catch (error) {
-      console.error("Token inválido o expirado en /auth/acceder:", error);
-      return NextResponse.next();
     }
   }
 
+  // Caso 2: Ruta no pública y sin token
   if (!accessToken && !publicRoutes.includes(pathname)) {
     return NextResponse.redirect(new URL("/auth/acceder", request.url));
   }
 
+  // Caso 3: Rutas de dashboard
   if (accessToken && pathname.startsWith("/dashboard/")) {
-    try {
-      const { payload } = await jwtVerify(accessToken, secret);
-      const userIdFromToken =
-        payload[
-          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-        ];
-      const urlUserId = pathname.split("/dashboard/")[1]?.split("/")[0];
-
-      if (urlUserId && userIdFromToken !== urlUserId) {
-        return new NextResponse("Acceso denegado", { status: 403 });
-      }
-    } catch (error) {
-      console.error("Token inválido o expirado en /dashboard:", error);
-      const { refreshAccessToken, accessToken: newToken } =
-        useAuthStore.getState();
-
-      await refreshAccessToken();
-      const updatedToken = useAuthStore.getState().accessToken;
-      if (!updatedToken) {
-        return NextResponse.redirect(new URL("/auth/acceder", request.url));
-      }
-      try {
-        const { payload } = await jwtVerify(updatedToken, secret);
-        const userIdFromToken =
-          payload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-          ];
-        const urlUserId = pathname.split("/dashboard/")[1]?.split("/")[0];
-        if (urlUserId && userIdFromToken !== urlUserId) {
-          return new NextResponse("Acceso denegado", { status: 403 });
-        }
-      } catch (refreshError) {
-        return NextResponse.redirect(new URL("/auth/acceder", request.url));
-      }
+    const userId = await verifyToken(accessToken, secret);
+    if (!userId) {
+      return NextResponse.redirect(new URL("/auth/acceder", request.url));
+    }
+    const urlUserId = pathname.split("/dashboard/")[1]?.split("/")[0];
+    if (urlUserId && userId !== urlUserId) {
+      return new NextResponse("Acceso denegado", { status: 403 });
     }
   }
 

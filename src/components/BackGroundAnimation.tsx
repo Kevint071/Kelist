@@ -103,7 +103,7 @@ const EnhancedBackgroundAnimation = () => {
   return (
     <>
       {/* Fondo de base con position: fixed */}
-      <div className="animate-fadeIn fixed inset-0 z-0 bg-gradient-to-br from-black via-slate-900 to-black" />
+      <div className="animate-fadeIn fixed inset-0 -z-10 bg-gradient-to-br from-black via-slate-900 to-black" />
 
       {/* Partículas flotantes con position: fixed */}
       <div className="fixed inset-0 z-0">

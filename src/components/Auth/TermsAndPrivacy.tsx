@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 type TermsAndPrivacyNoticeProps = {
-  message?: string;
+  message: string;
 };
 
-const TermsAndPrivacyNotice = ({ message = "Al registrarte, aceptas nuestros" }: TermsAndPrivacyNoticeProps) => {
+const TermsAndPrivacyNotice = ({ message }: TermsAndPrivacyNoticeProps) => {
   return (
     <div className="mt-4 text-center font-semibold">
       <p className="text-xs font-semibold text-gray-400">
