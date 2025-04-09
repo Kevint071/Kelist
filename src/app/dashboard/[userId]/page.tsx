@@ -27,7 +27,7 @@ export default function Dashboard({
     });
   }, [params, isAuthenticated, fetchTaskLists]);
 
-  if (!resolvedParams) return <div className="text-white">Loading...</div>;
+  if (!resolvedParams) return <div></div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   const { userId } = resolvedParams;
